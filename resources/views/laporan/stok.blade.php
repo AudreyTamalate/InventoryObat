@@ -150,41 +150,6 @@
             @endauth
         </div>
 
-        <div class="header">
-            <h2>Laporan Stok Obat</h2>
-            <div>
-                <form method="GET" action="{{ route('laporan.stok') }}"
-                    style="display:inline-block; margin-right:10px;">
-                    <label for="bulan">Filter Bulan:</label>
-                    <input type="month" id="bulan" name="bulan" value="{{ request('bulan') }}">
-                    <button type="submit" style="
-                background:#3b82f6; 
-                color:#fff; 
-                border:none; 
-                padding:6px 12px; 
-                border-radius:6px; 
-                cursor:pointer;">
-                        <i class="fa-solid fa-filter"></i> Filter
-                    </button>
-                </form>
-
-                <form method="GET" action="{{ route('laporan.stok.pdf') }}" target="_blank"
-                    style="display:inline-block;">
-                    <input type="hidden" name="bulan" value="{{ request('bulan') }}">
-                    <button type="submit" style="
-                background:#10b981; 
-                color:#fff; 
-                border:none; 
-                padding:6px 12px; 
-                border-radius:6px; 
-                cursor:pointer;">
-                        <i class="fa-solid fa-file-pdf"></i> Print PDF
-                    </button>
-                </form>
-            </div>
-        </div>
-
-
         <form method="POST" action="{{ route('logout') }}" style="padding: 0 20px; margin-top: auto;">
             @csrf
             <button type="submit" style="
@@ -203,6 +168,36 @@
 
         <div class="header">
             <h2>Laporan Stok Obat</h2>
+            <div>
+                <form method="GET" action="{{ route('laporan.stok') }}"
+                    style="display:inline-block; margin-right:10px;">
+                    <label for="bulan">Filter Bulan:</label>
+                    <input type="month" id="bulan" name="bulan" value="{{ request('bulan') }}">
+                    <button type="submit" style="
+                        background:#3b82f6; 
+                        color:#fff; 
+                        border:none; 
+                        padding:6px 12px; 
+                        border-radius:6px; 
+                        cursor:pointer;">
+                        <i class="fa-solid fa-filter"></i> Filter
+                    </button>
+                </form>
+
+                <form method="GET" action="{{ route('laporan.stok.pdf') }}" target="_blank"
+                    style="display:inline-block;">
+                    <input type="hidden" name="bulan" value="{{ request('bulan') }}">
+                    <button type="submit" style="
+                        background:#10b981; 
+                        color:#fff; 
+                        border:none; 
+                        padding:6px 12px; 
+                        border-radius:6px; 
+                        cursor:pointer;">
+                        <i class="fa-solid fa-file-pdf"></i> Print PDF
+                    </button>
+                </form>
+            </div>
         </div>
 
         <table>
@@ -212,7 +207,6 @@
                     <th>Item Code</th>
                     <th>Nama Obat</th>
                     <th>Satuan</th>
-                    <th>Produsen</th>
                     <th>Stok Masuk</th>
                     <th>Stok Keluar</th>
                     <th>Stok Akhir</th>
@@ -225,7 +219,6 @@
                         <td>{{ $item->item_code }}</td>
                         <td>{{ $item->nama_obat }}</td>
                         <td>{{ $item->unit_of_measurement }}</td>
-                        <td>{{ $item->produsen }}</td>
                         <td>{{ $item->stok_masuk }}</td>
                         <td>{{ $item->stok_keluar }}</td>
                         <td>{{ $item->stok_akhir }}</td>
@@ -240,5 +233,4 @@
     </div>
 
 </body>
-
 </html>

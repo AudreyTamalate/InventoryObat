@@ -42,12 +42,14 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:laporan stok');
 
     // Laporan Stok
-    Route::get('/laporan/stok', [LaporanController::class, 'stok'])
-        ->name('laporan.stok')
-        ->middleware('permission:laporan stok');
-    Route::get('/laporan/stok/pdf', [LaporanController::class, 'cetakStok'])
-        ->name('laporan.stok.pdf')
-        ->middleware('permission:laporan stok');
+Route::get('/laporan/stok', [LaporanController::class, 'laporanStok'])
+    ->name('laporan.stok')
+    ->middleware('permission:laporan stok');
+
+Route::get('/laporan/stok/pdf', [LaporanController::class, 'cetakStok'])
+    ->name('laporan.stok.pdf')
+    ->middleware('permission:laporan stok');
+
 
     // Laporan Keuangan
     Route::get('/laporan/keuangan', [LaporanController::class, 'keuangan'])

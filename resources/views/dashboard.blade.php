@@ -113,13 +113,14 @@
                 <i class="fa-solid fa-dolly"></i> Obat Keluar
             </a>
 
-
-            @auth
-                @if(auth()->user()->role === 'kepala_klinik')
-                    <div class="menu-title">Report</div>
+            <div class="menu-title">Report</div>
                     <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
                         <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
                     </a>
+
+
+            @auth
+                @if(auth()->user()->role === 'kepala_klinik')
                     <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
                         <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
                     </a>

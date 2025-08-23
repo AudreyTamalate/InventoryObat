@@ -229,14 +229,15 @@
                 <i class="fa-solid fa-dolly"></i> Obat Keluar
             </a>
 
+            <div class="menu-title">Report</div>
+                    <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
+                    </a>
+
 
 
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
-                    <div class="menu-title">Report</div>
-                    <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
-                    </a>
                     <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
                         <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
                     </a>
@@ -287,7 +288,7 @@
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $keluar->item_code }}</td>
                         <td>{{ $keluar->obat->nama_obat ?? '-' }}</td>
-                        <td>Rp {{ number_format($masuk->harga_jual, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($keluar->harga_jual, 0, ',', '.') }}</td>
                         <td>{{ $keluar->qty_keluar }}</td>
                         <td>{{ \Carbon\Carbon::parse($keluar->tanggal_keluar)->format('d M Y') }}</td>
                         <td>{{ $keluar->keterangan ?? '-' }}</td>

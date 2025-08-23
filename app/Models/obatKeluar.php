@@ -14,6 +14,7 @@ class ObatKeluar extends Model
 
     protected $fillable = [
         'item_code',
+        'harga_jual',
         'qty_keluar',
         'tanggal_keluar',
         'keterangan', // opsional: misalnya untuk catatan (resep, rusak, dll)

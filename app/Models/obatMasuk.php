@@ -16,8 +16,9 @@ class ObatMasuk extends Model
         'item_code',
         'farmasi',
         'batch',
-        'harga_pcs',
+        'harga_beli',
         'qty_masuk',
+        'tanggal_masuk',
         'expire_date',
     ];
 
