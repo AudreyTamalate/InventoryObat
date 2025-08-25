@@ -80,6 +80,8 @@
         .content {
             flex: 1;
             padding: 40px;
+            /* Added for horizontal scrolling */
+            overflow-x: auto;
         }
 
         .breadcrumb {
@@ -93,6 +95,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            /* Added for horizontal scrolling */
+            min-width: 900px;
         }
 
         .btn {
@@ -116,6 +120,8 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            /* Added to prevent line breaks in cell content */
+            white-space: nowrap;
         }
 
         th,
@@ -131,23 +137,41 @@
             font-weight: 600;
         }
 
-        .actions a {
-            margin-right: 8px;
-            color: #d97706;
-            text-decoration: none;
-            cursor: pointer;
+        /* Modified CSS for Actions buttons */
+        .actions {
+            display: flex;
+            gap: 5px;
         }
 
-        .actions form {
-            display: inline;
-        }
-
+        .actions a,
         .actions button {
-            background: none;
+            padding: 5px 10px;
             border: none;
-            color: red;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.2s;
         }
+
+        .edit-btn {
+            background-color: #2563eb;
+        }
+
+        .edit-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+        }
+
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+
+        /* End of modified CSS */
 
         /* Modal Style */
         .modal {
@@ -229,16 +253,16 @@
             </a>
 
             <div class="menu-title">Report</div>
-                    <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
-                    </a>
+            <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
+                <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
+            </a>
 
 
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
-                    <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
-                    </a>
+                <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
+                </a>
 
                 @endif
             @endauth
@@ -294,32 +318,32 @@
                         <td>{{ \Carbon\Carbon::parse($masuk->tanggal_masuk)->format('d M Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($masuk->expire_date)->format('d M Y') }}</td>
                         <td class="actions">
-                            <a href="javascript:void(0)" onclick="openEditModal(
-                                           '{{ $masuk->id }}',
-                                           '{{ $masuk->item_code }}',
-                                           '{{ $masuk->obat->nama_obat ?? '-' }}',
-                                           '{{ $masuk->farmasi }}',
-                                           '{{ $masuk->batch }}',
-                                           '{{ $masuk->harga_beli }}',
-                                           '{{ $masuk->qty_masuk }}',
-                                           '{{ $masuk->tanggal_masuk }}',
-                                           '{{ $masuk->expire_date }}'
-                                       )" class="edit">✏ Edit</a>
+                            <a href="javascript:void(0)"
+                                onclick="openEditModal(
+                                       '{{ $masuk->id }}',
+                                       '{{ $masuk->item_code }}',
+                                       '{{ $masuk->obat->nama_obat ?? '-' }}',
+                                       '{{ $masuk->farmasi }}',
+                                       '{{ $masuk->batch }}',
+                                       '{{ $masuk->harga_beli }}',
+                                       '{{ $masuk->qty_masuk }}',
+                                       '{{ $masuk->tanggal_masuk }}',
+                                       '{{ $masuk->expire_date }}'
+                                    )" class="edit-btn"><i class="fa-solid fa-edit"></i> Edit</a>
 
-                            <button type="button" class="delete"
-                                onclick="openDeleteModal('{{ $masuk->id }}','{{ $masuk->item_code }}')">🗑 Delete</button>
+                            <button type="button" class="delete-btn"
+                                onclick="openDeleteModal('{{ $masuk->id }}','{{ $masuk->item_code }}')"><i class="fa-solid fa-trash"></i> Delete</button>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9">Data belum tersedia</td>
+                        <td colspan="10">Data belum tersedia</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    <!-- Modal Delete -->
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <div class="modal-header">Konfirmasi Hapus</div>
@@ -335,7 +359,6 @@
         </div>
     </div>
 
-    <!-- Modal Edit -->
     <div class="modal" id="editModal">
         <div class="modal-content">
             <div class="modal-header">Edit Obat Masuk</div>
@@ -350,7 +373,7 @@
                 <input type="text" id="editNamaObat" readonly>
 
                 <label>Farmasi</label>
-                <input type="text" id="edit_farmasi" name="farmasi" readonly>
+                <input type="text" id="edit_farmasi" name="farmasi" required>
 
                 <label>Batch</label>
                 <input type="text" id="edit_batch" name="batch" required>
@@ -387,7 +410,7 @@
             document.getElementById("deleteModal").style.display = "none";
         }
 
-        function openEditModal(id, item_code, namaObat, farmasi, batch, harga, qty, tanggal, expire,) {
+        function openEditModal(id, item_code, namaObat, farmasi, batch, harga, qty, tanggal, expire) {
             document.getElementById("editItemCode").value = item_code;
             document.getElementById("editNamaObat").value = namaObat;
             document.getElementById("edit_farmasi").value = farmasi;

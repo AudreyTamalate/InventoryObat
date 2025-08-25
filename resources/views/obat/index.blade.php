@@ -130,24 +130,31 @@
             background-color: #f3f4f6;
             font-weight: 600;
         }
-
-        .actions a {
-            margin-right: 8px;
-            color: #d97706;
-            text-decoration: none;
-            cursor: pointer;
+        
+        /* CSS yang dimodifikasi untuk tombol Aksi */
+        .actions {
+            display: flex;
+            gap: 5px;
         }
 
-        .actions form {
-            display: inline;
-        }
-
+        .actions a, 
         .actions button {
-            background: none;
+            padding: 5px 10px;
             border: none;
-            color: red;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.2s;
         }
+        
+        .edit-btn { background-color: #2563eb; }
+        .edit-btn:hover { background-color: #1d4ed8; }
+        
+        .delete-btn { background-color: #ef4444; }
+        .delete-btn:hover { background-color: #dc2626; }
+        /* End of modified CSS */
 
         /* Modal Style */
         .modal {
@@ -229,17 +236,17 @@
             </a>
 
             <div class="menu-title">Report</div>
-                    <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
-                    </a>
+            <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
+                <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
+            </a>
 
 
 
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
-                    <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
-                    </a>
+                <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
+                </a>
 
                 @endif
             @endauth
@@ -285,26 +292,25 @@
                         <td>{{ $obat->unit_of_measurement }}</td>
                         <td>{{ $obat->produsen }}</td>
                         <td class="actions">
-                            <a href="javascript:void(0)"
-                                onclick="openEditModal('{{ $obat->id }}','{{ $obat->item_code }}','{{ $obat->nama_obat }}','{{ $obat->unit_of_measurement }}','{{ $obat->produsen }}')">✏
-                                Edit</a>
-                            <button type="button" class="btn btn-danger"
+                            <a href="javascript:void(0)" class="edit-btn"
+                                onclick="openEditModal('{{ $obat->id }}','{{ $obat->item_code }}','{{ $obat->nama_obat }}','{{ $obat->unit_of_measurement }}','{{ $obat->produsen }}')">
+                                <i class="fa-solid fa-edit"></i> Edit
+                            </a>
+                            <button type="button" class="delete-btn"
                                 onclick="openDeleteModal('{{ $obat->id }}', '{{ $obat->nama_obat }}')">
-                                🗑 Delete
+                                <i class="fa-solid fa-trash"></i> Delete
                             </button>
-                            </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4">Belum ada data obat.</td>
+                        <td colspan="5">Belum ada data obat.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    <!-- Modal Delete -->
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <div class="modal-header">Konfirmasi Hapus</div>
@@ -319,7 +325,6 @@
             </form>
         </div>
     </div>
-    <!-- Modal Edit -->
     <div class="modal" id="editModal">
         <div class="modal-content">
             <div class="modal-header">Edit Obat</div>
@@ -354,13 +359,14 @@
     </div>
 
     <script>
-        function openDeleteModal(id, kode) {
+        function openDeleteModal(id, nama_obat) {
             document.getElementById("deleteMessage").innerText =
-                "Apakah Anda yakin ingin menghapus data ini?";
+                "Apakah Anda yakin ingin menghapus data obat " + nama_obat + "?";
             let form = document.getElementById("deleteForm");
-            form.action = "/obat-masuk/" + id;
+            form.action = "/obat/" + id;
             document.getElementById("deleteModal").style.display = "flex";
         }
+
         function closeDeleteModal() {
             document.getElementById("deleteModal").style.display = "none";
         }

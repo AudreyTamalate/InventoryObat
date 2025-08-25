@@ -91,6 +91,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         table {
@@ -114,14 +116,128 @@
             background-color: #f3f4f6;
             font-weight: 600;
         }
+
+        .filter-form {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .filter-form .form-group {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+
+        .filter-form label {
+            margin-bottom: 4px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .filter-form input,
+        .filter-form select {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 14px;
+            min-width: 160px;
+        }
+
+        .btn-tampilkan {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-tampilkan:hover {
+            background: #1d4ed8;
+        }
+
+        .actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .pdf-form button,
+        .btn-pdf {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-pdf:hover {
+            background: #059669;
+        }
+
+        .pdf-form {
+            margin-top: 5px;
+            /* biar sejajar */
+        }
+
+        /* Tambahan CSS untuk warna baris */
+        .yellow-row {
+            background-color: #fef6a1ff;
+        }
+
+        .red-row {
+            background-color: #fe899bff;
+        }
+
+        .actions-btn {
+            display: flex;
+            gap: 5px;
+        }
+
+        .actions-btn a,
+        .actions-btn button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.2s;
+        }
+
+        .edit-btn {
+            background-color: #2563eb;
+        }
+
+        .edit-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+        }
+
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
     </style>
 </head>
 
 <body>
-
     <div class="sidebar">
         <div class="logo">Klinik XYZ</div>
-
         <div class="menu">
             <div class="menu-title">Main Operational</div>
             <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
@@ -136,7 +252,6 @@
             <a href="/obat-keluar" class="{{ request()->is('obat-keluar*') ? 'active' : '' }}">
                 <i class="fa-solid fa-dolly"></i> Obat Keluar
             </a>
-
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
                     <div class="menu-title">Report</div>
@@ -149,51 +264,44 @@
                 @endif
             @endauth
         </div>
-
         <form method="POST" action="{{ route('logout') }}" style="padding: 0 20px; margin-top: auto;">
             @csrf
-            <button type="submit" style="
-                background:#ef4444; 
-                color:#fff; 
-                border:none; 
-                padding:10px; 
-                border-radius:8px; 
-                width:100%; 
-                cursor:pointer;">Logout</button>
+            <button type="submit"
+                style="background:#ef4444;color:#fff;border:none;padding:10px;border-radius:8px;width:100%;cursor:pointer;">Logout</button>
         </form>
     </div>
 
     <div class="content">
         <div class="breadcrumb">Laporan / Stok</div>
-
         <div class="header">
             <h2>Laporan Stok Obat</h2>
-            <div>
-                <form method="GET" action="{{ route('laporan.stok') }}"
-                    style="display:inline-block; margin-right:10px;">
-                    <label for="bulan">Filter Bulan:</label>
-                    <input type="month" id="bulan" name="bulan" value="{{ request('bulan') }}">
-                    <button type="submit" style="
-                        background:#3b82f6; 
-                        color:#fff; 
-                        border:none; 
-                        padding:6px 12px; 
-                        border-radius:6px; 
-                        cursor:pointer;">
-                        <i class="fa-solid fa-filter"></i> Filter
-                    </button>
+            <div class="actions">
+
+                <form method="GET" action="{{ route('laporan.stok') }}" class="filter-form">
+
+                    <div class="form-group">
+                        <label for="filter">Filter:</label>
+                        <select name="filter" id="filter">
+                            <option value="">-- Pilih Filter --</option>
+                            <option value="stok_terbanyak" {{ $filter == 'stok_terbanyak' ? 'selected' : '' }}>Stok
+                                Terbanyak</option>
+                            <option value="stok_tersedikit" {{ $filter == 'stok_tersedikit' ? 'selected' : '' }}>Stok
+                                Tersedikit</option>
+                            <option value="expire_date" {{ $filter == 'expire_date' ? 'selected' : '' }}>Expire Date
+                                Terdekat
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn-tampilkan">Tampilkan</button>
+                    </div>
                 </form>
 
-                <form method="GET" action="{{ route('laporan.stok.pdf') }}" target="_blank"
-                    style="display:inline-block;">
+                <form method="GET" action="{{ route('laporan.stok.pdf') }}" target="_blank" class="pdf-form">
                     <input type="hidden" name="bulan" value="{{ request('bulan') }}">
-                    <button type="submit" style="
-                        background:#10b981; 
-                        color:#fff; 
-                        border:none; 
-                        padding:6px 12px; 
-                        border-radius:6px; 
-                        cursor:pointer;">
+                    <input type="hidden" name="obat" value="{{ request('obat') }}">
+                    <button type="submit" class="btn-pdf">
                         <i class="fa-solid fa-file-pdf"></i> Print PDF
                     </button>
                 </form>
@@ -210,11 +318,34 @@
                     <th>Stok Masuk</th>
                     <th>Stok Keluar</th>
                     <th>Stok Akhir</th>
+                    <th>Exp Date</th>
+                    @auth
+                        @if(auth()->user()->role === 'kepala_klinik')
+                            <th>Aksi</th>
+                        @endif
+                    @endauth
                 </tr>
             </thead>
             <tbody>
                 @forelse ($stok as $index => $item)
-                    <tr>
+                    @php
+                        // Inisialisasi variabel kelas
+                        $rowClass = '';
+                        // Periksa apakah item memiliki tanggal kedaluwarsa
+                        if ($item->expire_date) {
+                            $expDate = \Carbon\Carbon::parse($item->expire_date);
+                            $today = \Carbon\Carbon::now();
+                            $diffInMonths = $today->diffInMonths($expDate, false);
+
+                            // Logika untuk warna
+                            if ($diffInMonths <= 3 && $diffInMonths >= 0) {
+                                $rowClass = 'red-row';
+                            } elseif ($diffInMonths <= 6 && $diffInMonths > 3) {
+                                $rowClass = 'yellow-row';
+                            }
+                        }
+                    @endphp
+                    <tr class="{{ $rowClass }}">
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $item->item_code }}</td>
                         <td>{{ $item->nama_obat }}</td>
@@ -222,15 +353,35 @@
                         <td>{{ $item->stok_masuk }}</td>
                         <td>{{ $item->stok_keluar }}</td>
                         <td>{{ $item->stok_akhir }}</td>
+                        <td>
+                            {{ $item->expire_date ? \Carbon\Carbon::parse($item->expire_date)->format('d M Y') : '-' }}
+                        </td>
+                        @auth
+                            @if(auth()->user()->role === 'kepala_klinik')
+                                <td class="actions-btn">
+                                    <a href="/obat/{{ $item->item_code }}/edit" class="edit-btn">
+                                        <i class="fa-solid fa-edit"></i> Edit
+                                    </a>
+                                    <form action="/obat/{{ $item->item_code }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="delete-btn"
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                            <i class="fa-solid fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            @endif
+                        @endauth
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8">Belum ada data stok obat.</td>
+                        <td colspan="9">Belum ada data stok obat.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-
 </body>
+
 </html>
