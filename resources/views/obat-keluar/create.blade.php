@@ -76,7 +76,6 @@
             font-weight: bold;
         }
 
-
         .content {
             flex: 1;
             padding: 40px;
@@ -144,6 +143,42 @@
             border-radius: 8px;
             font-weight: bold;
         }
+
+        /* Custom combobox */
+        .combobox {
+            position: relative;
+            width: 100%;
+        }
+
+        .combobox input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .combobox-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: none;
+            z-index: 10;
+        }
+
+        .combobox-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .combobox-item:hover {
+            background: #f3f4f6;
+        }
     </style>
 </head>
 
@@ -168,30 +203,22 @@
             </a>
 
             <div class="menu-title">Report</div>
-                    <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
-                    </a>
+            <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
+                <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
+            </a>
 
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
                     <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
                         <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
                     </a>
-
                 @endif
             @endauth
         </div>
 
         <form method="POST" action="{{ route('logout') }}" style="padding: 0 20px; margin-top: auto;">
             @csrf
-            <button type="submit" style="
-      background:#ef4444; 
-      color:#fff; 
-      border:none; 
-      padding:10px; 
-      border-radius:8px; 
-      width:100%; 
-      cursor:pointer;">Logout</button>
+            <button type="submit" style="background:#ef4444; color:#fff; border:none; padding:10px; border-radius:8px; width:100%; cursor:pointer;">Logout</button>
         </form>
     </div>
 
@@ -206,15 +233,18 @@
                 @csrf
                 <div class="form-grid">
                     <div>
-                        <label>Item Code*</label>
-                        <select name="item_code" required>
-                            <option value="">Pilih Item Code</option>
-                            @foreach($obats as $obat)
-                                <option value="{{ $obat->item_code }}">
-                                    {{ $obat->item_code }} - {{ $obat->nama_obat }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <label>Item Code / Nama Obat*</label>
+                        <div class="combobox">
+                            <input type="text" id="itemSearch" placeholder="Ketik item code atau nama obat...">
+                            <div class="combobox-list" id="itemList">
+                                @foreach($obats as $obat)
+                                    <div class="combobox-item" data-value="{{ $obat->item_code }}">
+                                        {{ $obat->item_code }} - {{ $obat->nama_obat }}
+                                    </div>
+                                @endforeach
+                            </div>
+                            <input type="hidden" name="item_code" id="itemCode">
+                        </div>
 
                         <label>Harga Jual*</label>
                         <input type="number" name="harga_jual" placeholder="Contoh: 5000" required>
@@ -236,6 +266,47 @@
         </div>
     </div>
 
+    <script>
+        const searchInput = document.getElementById('itemSearch');
+        const itemList = document.getElementById('itemList');
+        const hiddenInput = document.getElementById('itemCode');
+
+        searchInput.addEventListener('focus', () => {
+            itemList.style.display = 'block';
+        });
+
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            const items = itemList.querySelectorAll('.combobox-item');
+            let hasVisible = false;
+
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(filter)) {
+                    item.style.display = 'block';
+                    hasVisible = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            itemList.style.display = hasVisible ? 'block' : 'none';
+        });
+
+        itemList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('combobox-item')) {
+                searchInput.value = e.target.textContent;
+                hiddenInput.value = e.target.dataset.value;
+                itemList.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.combobox')) {
+                itemList.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 
 </html>
