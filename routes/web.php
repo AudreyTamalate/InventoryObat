@@ -6,6 +6,7 @@ use App\Http\Controllers\ObatMasukController;
 use App\Http\Controllers\ObatKeluarController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\DashboardController;
 
 // Login dan auth
 Route::get('/login', [AuthController::class, 'login'])->name('login');
@@ -16,6 +17,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 
 // Halaman utama
 Route::get('/', function () {
@@ -42,14 +46,15 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('permission:laporan stok');
 
     // Laporan Stok
-Route::get('/laporan/stok', [LaporanController::class, 'laporanStok'])
-    ->name('laporan.stok')
-    ->middleware('permission:laporan stok');
+    Route::get('/laporan/stok', [LaporanController::class, 'laporanStok'])
+        ->name('laporan.stok')
+        ->middleware('permission:laporan stok');
 
-Route::get('/laporan/stok/pdf', [LaporanController::class, 'cetakStok'])
-    ->name('laporan.stok.pdf')
-    ->middleware('permission:laporan stok');
+    Route::get('/laporan/stok/pdf', [LaporanController::class, 'cetakStok'])
+        ->name('laporan.stok.pdf')
+        ->middleware('permission:laporan stok');
 
+    Route::get('laporan/keuangan/pdf', [LaporanController::class, 'keuanganPdf'])->name('laporan.keuangan.pdf');
 
     // Laporan Keuangan
     Route::get('/laporan/keuangan', [LaporanController::class, 'keuangan'])

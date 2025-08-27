@@ -8,7 +8,6 @@
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 10px;
-            /* Mengecilkan ukuran font dasar */
             margin: 20px;
         }
 
@@ -23,6 +22,15 @@
             font-size: 10px;
         }
 
+        .report-info {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .report-info p {
+            margin: 2px 0;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -33,17 +41,14 @@
         td {
             border: 1px solid #000;
             padding: 4px 5px;
-            /* Mengurangi padding */
             text-align: left;
             font-size: 9px;
-            /* Mengecilkan font di dalam sel */
         }
 
         th {
             background-color: #f2f2f2;
             font-weight: bold;
             font-size: 9.5px;
-            /* Mengecilkan font di header */
         }
 
         tbody tr:nth-child(even) {
@@ -54,7 +59,9 @@
 
 <body>
     <h2>Laporan Stok Obat</h2>
-    <p>Laporan per Bulan: {{ $bulanTampil }}</p>
+    <div class="report-info">
+        <p>Tanggal Laporan: {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+    </div>
 
     <table>
         <thead>

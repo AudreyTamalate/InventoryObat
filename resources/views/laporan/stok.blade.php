@@ -117,50 +117,6 @@
             font-weight: 600;
         }
 
-        .filter-form {
-            display: flex;
-            gap: 20px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .filter-form .form-group {
-            display: flex;
-            flex-direction: column;
-            font-size: 14px;
-        }
-
-        .filter-form label {
-            margin-bottom: 4px;
-            color: #374151;
-            font-weight: 500;
-        }
-
-        .filter-form input,
-        .filter-form select {
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 6px 10px;
-            font-size: 14px;
-            min-width: 160px;
-        }
-
-        .btn-tampilkan {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-        .btn-tampilkan:hover {
-            background: #1d4ed8;
-        }
-
         .actions {
             display: flex;
             align-items: flex-end;
@@ -186,18 +142,113 @@
             background: #059669;
         }
 
-        .pdf-form {
-            margin-top: 5px;
-            /* biar sejajar */
+        /* New CSS for the dropdown filter */
+        .dropdown-container {
+            position: relative;
+        }
+
+        .btn-filter {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-filter:hover {
+            background: #1d4ed8;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 250px;
+            z-index: 100;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .dropdown-menu .filter-options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .dropdown-menu .filter-options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .dropdown-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-cancel {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e5e7eb;
+        }
+
+        .btn-apply {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-apply:hover {
+            background: #1d4ed8;
         }
 
         /* Tambahan CSS untuk warna baris */
         .yellow-row {
-            background-color: #fef6a1ff;
+            background-color: #fef6a1;
         }
 
         .red-row {
-            background-color: #fe899bff;
+            background-color: #fe899b;
+        }
+
+        .black-row {
+            background-color: #4b5563;
+            color: #fff;
         }
 
         .actions-btn {
@@ -232,6 +283,11 @@
         .delete-btn:hover {
             background-color: #dc2626;
         }
+
+        .black-row .edit-btn,
+        .black-row .delete-btn {
+            background-color: #6b7280;
+        }
     </style>
 </head>
 
@@ -252,12 +308,13 @@
             <a href="/obat-keluar" class="{{ request()->is('obat-keluar*') ? 'active' : '' }}">
                 <i class="fa-solid fa-dolly"></i> Obat Keluar
             </a>
+
+            <div class="menu-title">Report</div>
+            <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
+                <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
+            </a>
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
-                    <div class="menu-title">Report</div>
-                    <a href="/laporan/stok" class="{{ request()->is('laporan/stok*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-chart-column"></i> Laporan Stok Obat
-                    </a>
                     <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
                         <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
                     </a>
@@ -276,31 +333,39 @@
         <div class="header">
             <h2>Laporan Stok Obat</h2>
             <div class="actions">
-
-                <form method="GET" action="{{ route('laporan.stok') }}" class="filter-form">
-
-                    <div class="form-group">
-                        <label for="filter">Filter:</label>
-                        <select name="filter" id="filter">
-                            <option value="">-- Pilih Filter --</option>
-                            <option value="stok_terbanyak" {{ $filter == 'stok_terbanyak' ? 'selected' : '' }}>Stok
-                                Terbanyak</option>
-                            <option value="stok_tersedikit" {{ $filter == 'stok_tersedikit' ? 'selected' : '' }}>Stok
-                                Tersedikit</option>
-                            <option value="expire_date" {{ $filter == 'expire_date' ? 'selected' : '' }}>Expire Date
-                                Terdekat
-                            </option>
-                        </select>
+                <div class="dropdown-container">
+                    <button type="button" class="btn-filter" id="dropdownFilterBtn">
+                        <i class="fa-solid fa-filter"></i> Filter
+                    </button>
+                    <div class="dropdown-menu" id="dropdownFilterMenu">
+                        <form method="GET" action="{{ route('laporan.stok') }}" class="dropdown-filter-form">
+                            <label>Pilih Filter:</label>
+                            <div class="filter-options">
+                                <label>
+                                    <input type="radio" name="filter" value="stok_terbanyak"
+                                        {{ request('filter') == 'stok_terbanyak' ? 'checked' : '' }}>
+                                    Stok Terbanyak
+                                </label>
+                                <label>
+                                    <input type="radio" name="filter" value="stok_tersedikit"
+                                        {{ request('filter') == 'stok_tersedikit' ? 'checked' : '' }}>
+                                    Stok Tersedikit
+                                </label>
+                                <label>
+                                    <input type="radio" name="filter" value="expire_date"
+                                        {{ request('filter') == 'expire_date' ? 'checked' : '' }}>
+                                    Expire Date Terdekat
+                                </label>
+                            </div>
+                            <div class="dropdown-actions">
+                                <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
+                                <button type="submit" class="btn-apply">Apply</button>
+                            </div>
+                        </form>
                     </div>
-
-                    <div class="form-group">
-                        <button type="submit" class="btn-tampilkan">Tampilkan</button>
-                    </div>
-                </form>
-
+                </div>
                 <form method="GET" action="{{ route('laporan.stok.pdf') }}" target="_blank" class="pdf-form">
-                    <input type="hidden" name="bulan" value="{{ request('bulan') }}">
-                    <input type="hidden" name="obat" value="{{ request('obat') }}">
+                    <input type="hidden" name="filter" value="{{ request('filter') }}">
                     <button type="submit" class="btn-pdf">
                         <i class="fa-solid fa-file-pdf"></i> Print PDF
                     </button>
@@ -329,18 +394,17 @@
             <tbody>
                 @forelse ($stok as $index => $item)
                     @php
-                        // Inisialisasi variabel kelas
                         $rowClass = '';
-                        // Periksa apakah item memiliki tanggal kedaluwarsa
                         if ($item->expire_date) {
                             $expDate = \Carbon\Carbon::parse($item->expire_date);
                             $today = \Carbon\Carbon::now();
-                            $diffInMonths = $today->diffInMonths($expDate, false);
+                            $diffInDays = $today->diffInDays($expDate, false);
 
-                            // Logika untuk warna
-                            if ($diffInMonths <= 3 && $diffInMonths >= 0) {
+                            if ($expDate->isPast()) {
+                                $rowClass = 'black-row';
+                            } elseif ($diffInDays <= 90 && $diffInDays >= 0) {
                                 $rowClass = 'red-row';
-                            } elseif ($diffInMonths <= 6 && $diffInMonths > 3) {
+                            } elseif ($diffInDays <= 180 && $diffInDays > 90) {
                                 $rowClass = 'yellow-row';
                             }
                         }
@@ -382,6 +446,29 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownBtn = document.getElementById('dropdownFilterBtn');
+            const dropdownMenu = document.getElementById('dropdownFilterMenu');
+            const cancelBtn = document.getElementById('btnCancel');
+            const dropdownContainer = document.querySelector('.dropdown-container');
+
+            dropdownBtn.addEventListener('click', function () {
+                dropdownMenu.classList.toggle('show');
+            });
+
+            cancelBtn.addEventListener('click', function () {
+                dropdownMenu.classList.remove('show');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!dropdownContainer.contains(event.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

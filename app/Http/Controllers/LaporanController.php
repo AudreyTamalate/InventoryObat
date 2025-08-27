@@ -14,52 +14,20 @@ class LaporanController extends Controller
     {
         $request->validate([
             'filter' => 'nullable|in:stok_terbanyak,stok_tersedikit,expire_date',
-            'bulan' => 'nullable|date_format:Y-m',
         ]);
 
         $filter = $request->filter;
-        $bulanFilter = $request->bulan ? Carbon::parse($request->bulan) : null;
-        
-        // Tambahkan baris ini untuk mendefinisikan variabel
         $tanggalSekarang = Carbon::now();
 
-        // Kueri untuk mendapatkan stok awal
-        $stokAwalSubquery = DB::table('obats')
-            ->select('obats.item_code', DB::raw('(COALESCE(SUM(obat_masuk.qty_masuk), 0) - COALESCE(SUM(obat_keluar.qty_keluar), 0)) as stok_awal'))
-            ->leftJoin('obat_masuk', function ($join) use ($bulanFilter, $tanggalSekarang) {
-                $join->on('obats.item_code', '=', 'obat_masuk.item_code')
-                     ->where('obat_masuk.tanggal_masuk', '<', $bulanFilter ? $bulanFilter->startOfMonth() : $tanggalSekarang->startOfMonth());
-            })
-            ->leftJoin('obat_keluar', function ($join) use ($bulanFilter, $tanggalSekarang) {
-                $join->on('obats.item_code', '=', 'obat_keluar.item_code')
-                     ->where('obat_keluar.tanggal_keluar', '<', $bulanFilter ? $bulanFilter->startOfMonth() : $tanggalSekarang->startOfMonth());
-            })
-            ->groupBy('obats.item_code');
-
         $stok = DB::table('obats')
-            ->select('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement', 'stok_awal.stok_awal')
+            ->select('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement')
             ->selectRaw('COALESCE(SUM(obat_masuk.qty_masuk),0) as stok_masuk')
             ->selectRaw('COALESCE(SUM(obat_keluar.qty_keluar),0) as stok_keluar')
-            ->selectRaw('(COALESCE(stok_awal.stok_awal, 0) + COALESCE(SUM(obat_masuk.qty_masuk),0) - COALESCE(SUM(obat_keluar.qty_keluar),0)) as stok_akhir')
+            ->selectRaw('(COALESCE(SUM(obat_masuk.qty_masuk),0) - COALESCE(SUM(obat_keluar.qty_keluar),0)) as stok_akhir')
             ->selectRaw('MIN(obat_masuk.expire_date) as expire_date')
-            ->leftJoinSub($stokAwalSubquery, 'stok_awal', function ($join) {
-                $join->on('obats.item_code', '=', 'stok_awal.item_code');
-            })
-            ->leftJoin('obat_masuk', function ($join) use ($bulanFilter) {
-                $join->on('obats.item_code', '=', 'obat_masuk.item_code');
-                if ($bulanFilter) {
-                    $join->whereYear('obat_masuk.tanggal_masuk', $bulanFilter->year)
-                         ->whereMonth('obat_masuk.tanggal_masuk', $bulanFilter->month);
-                }
-            })
-            ->leftJoin('obat_keluar', function ($join) use ($bulanFilter) {
-                $join->on('obats.item_code', '=', 'obat_keluar.item_code');
-                if ($bulanFilter) {
-                    $join->whereYear('obat_keluar.tanggal_keluar', $bulanFilter->year)
-                         ->whereMonth('obat_keluar.tanggal_keluar', $bulanFilter->month);
-                }
-            })
-            ->groupBy('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement', 'stok_awal.stok_awal');
+            ->leftJoin('obat_masuk', 'obats.item_code', '=', 'obat_masuk.item_code')
+            ->leftJoin('obat_keluar', 'obats.item_code', '=', 'obat_keluar.item_code')
+            ->groupBy('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement');
 
         // Tambahkan filter
         if ($filter === 'stok_terbanyak') {
@@ -73,7 +41,7 @@ class LaporanController extends Controller
         }
 
         $stok = $stok->get();
-        $bulanTampil = $bulanFilter ? $bulanFilter->translatedFormat('F Y') : 'Semua';
+        $bulanTampil = 'Semua';
 
         return view('laporan.stok', compact('stok', 'filter', 'bulanTampil'));
     }
@@ -83,50 +51,21 @@ class LaporanController extends Controller
     {
         $request->validate([
             'filter' => 'nullable|in:stok_terbanyak,stok_tersedikit,expire_date',
-            'bulan' => 'nullable|date_format:Y-m',
         ]);
 
         $filter = $request->filter;
-        $bulanFilter = $request->bulan ? Carbon::parse($request->bulan) : null;
         $tanggalSekarang = Carbon::now();
-
-        // Kueri untuk mendapatkan stok awal
-        $stokAwalSubquery = DB::table('obats')
-            ->select('obats.item_code', DB::raw('(COALESCE(SUM(obat_masuk.qty_masuk), 0) - COALESCE(SUM(obat_keluar.qty_keluar), 0)) as stok_awal'))
-            ->leftJoin('obat_masuk', function ($join) use ($bulanFilter, $tanggalSekarang) {
-                $join->on('obats.item_code', '=', 'obat_masuk.item_code')
-                     ->where('obat_masuk.tanggal_masuk', '<', $bulanFilter ? $bulanFilter->startOfMonth() : $tanggalSekarang->startOfMonth());
-            })
-            ->leftJoin('obat_keluar', function ($join) use ($bulanFilter, $tanggalSekarang) {
-                $join->on('obats.item_code', '=', 'obat_keluar.item_code')
-                     ->where('obat_keluar.tanggal_keluar', '<', $bulanFilter ? $bulanFilter->startOfMonth() : $tanggalSekarang->startOfMonth());
-            })
-            ->groupBy('obats.item_code');
+        $bulanTampil = 'Semua';
 
         $stok = DB::table('obats')
-            ->select('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement', 'stok_awal.stok_awal')
+            ->select('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement')
             ->selectRaw('COALESCE(SUM(obat_masuk.qty_masuk),0) as stok_masuk')
             ->selectRaw('COALESCE(SUM(obat_keluar.qty_keluar),0) as stok_keluar')
-            ->selectRaw('(COALESCE(stok_awal.stok_awal, 0) + COALESCE(SUM(obat_masuk.qty_masuk),0) - COALESCE(SUM(obat_keluar.qty_keluar),0)) as stok_akhir')
+            ->selectRaw('(COALESCE(SUM(obat_masuk.qty_masuk),0) - COALESCE(SUM(obat_keluar.qty_keluar),0)) as stok_akhir')
             ->selectRaw('MIN(obat_masuk.expire_date) as expire_date')
-            ->leftJoinSub($stokAwalSubquery, 'stok_awal', function ($join) {
-                $join->on('obats.item_code', '=', 'stok_awal.item_code');
-            })
-            ->leftJoin('obat_masuk', function ($join) use ($bulanFilter) {
-                $join->on('obats.item_code', '=', 'obat_masuk.item_code');
-                if ($bulanFilter) {
-                    $join->whereYear('obat_masuk.tanggal_masuk', $bulanFilter->year)
-                         ->whereMonth('obat_masuk.tanggal_masuk', $bulanFilter->month);
-                }
-            })
-            ->leftJoin('obat_keluar', function ($join) use ($bulanFilter) {
-                $join->on('obats.item_code', '=', 'obat_keluar.item_code');
-                if ($bulanFilter) {
-                    $join->whereYear('obat_keluar.tanggal_keluar', $bulanFilter->year)
-                         ->whereMonth('obat_keluar.tanggal_keluar', $bulanFilter->month);
-                }
-            })
-            ->groupBy('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement', 'stok_awal.stok_awal');
+            ->leftJoin('obat_masuk', 'obats.item_code', '=', 'obat_masuk.item_code')
+            ->leftJoin('obat_keluar', 'obats.item_code', '=', 'obat_keluar.item_code')
+            ->groupBy('obats.item_code', 'obats.nama_obat', 'obats.unit_of_measurement');
 
         if ($filter === 'stok_terbanyak') {
             $stok->orderByDesc('stok_akhir');
@@ -139,11 +78,90 @@ class LaporanController extends Controller
         }
 
         $stok = $stok->get();
-        $bulanTampil = $bulanFilter ? $bulanFilter->translatedFormat('F Y') : 'Semua';
-
+        
         $pdf = Pdf::loadView('laporan.stok_pdf', compact('stok', 'filter', 'bulanTampil'))
             ->setPaper('a4', orientation: 'portrait');
 
         return $pdf->download('laporan-stok-' . date('Y-m-d') . '.pdf');
+    }
+
+    // Laporan keuangan (halaman web)
+    public function keuangan(Request $request)
+    {
+        // Default to the current month and year
+        $bulanTerpilih = $request->input('bulan', date('Y-m'));
+
+        // Get the start and end dates for the selected month
+        $startDate = Carbon::createFromFormat('Y-m', $bulanTerpilih)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $bulanTerpilih)->endOfMonth();
+
+        // Fetch data for the report
+        $laporan = DB::table('obat_keluar')
+            ->join('obats', 'obat_keluar.item_code', '=', 'obats.item_code')
+            ->whereBetween('obat_keluar.tanggal_keluar', [$startDate, $endDate])
+            ->select(
+                'obats.item_code',
+                'obats.nama_obat',
+                // Ambil harga beli terbaru dari tabel 'obat_masuk'
+                DB::raw('(SELECT harga_beli FROM obat_masuk WHERE item_code = obats.item_code ORDER BY tanggal_masuk DESC LIMIT 1) as harga_beli'),
+                DB::raw('SUM(obat_keluar.qty_keluar) as jumlah_keluar'),
+                // Hitung Total Beli berdasarkan harga beli terbaru dan jumlah keluar
+                DB::raw('(SELECT harga_beli FROM obat_masuk WHERE item_code = obats.item_code ORDER BY tanggal_masuk DESC LIMIT 1) * SUM(obat_keluar.qty_keluar) as total_beli'),
+                // Ambil harga jual dari transaksi keluar
+                DB::raw('obat_keluar.harga_jual as harga_jual'),
+                // Hitung Total Jual
+                DB::raw('SUM(obat_keluar.harga_jual * obat_keluar.qty_keluar) as total_jual')
+            )
+            ->groupBy('obats.item_code', 'obats.nama_obat', 'obat_keluar.harga_jual')
+            ->get();
+        
+        // Loop untuk menambahkan kolom 'pendapatan' yang dihitung
+        foreach ($laporan as $item) {
+            $item->pendapatan = $item->total_jual - $item->total_beli;
+        }
+
+        // Generate list of months for the filter dropdown
+        $daftarBulan = [];
+        $sekarang = Carbon::now();
+        for ($i = 0; $i < 12; $i++) {
+            $bulan = $sekarang->copy()->subMonths($i);
+            $daftarBulan[] = [
+                'value' => $bulan->format('Y-m'),
+                'name' => $bulan->translatedFormat('F Y')
+            ];
+        }
+
+        return view('laporan.keuangan', compact('laporan', 'bulanTerpilih', 'daftarBulan'));
+    }
+
+    // Cetak PDF laporan keuangan
+    public function keuanganPdf(Request $request)
+    {
+        $bulanTerpilih = $request->input('bulan', date('Y-m'));
+        $startDate = Carbon::createFromFormat('Y-m', $bulanTerpilih)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $bulanTerpilih)->endOfMonth();
+        $bulanTampil = Carbon::createFromFormat('Y-m', $bulanTerpilih)->translatedFormat('F Y');
+
+        $laporan = DB::table('obat_keluar')
+            ->join('obats', 'obat_keluar.item_code', '=', 'obats.item_code')
+            ->whereBetween('obat_keluar.tanggal_keluar', [$startDate, $endDate])
+            ->select(
+                'obats.item_code',
+                'obats.nama_obat',
+                DB::raw('(SELECT harga_beli FROM obat_masuk WHERE item_code = obats.item_code ORDER BY tanggal_masuk DESC LIMIT 1) as harga_beli'),
+                DB::raw('SUM(obat_keluar.qty_keluar) as jumlah_keluar'),
+                DB::raw('(SELECT harga_beli FROM obat_masuk WHERE item_code = obats.item_code ORDER BY tanggal_masuk DESC LIMIT 1) * SUM(obat_keluar.qty_keluar) as total_beli'),
+                DB::raw('obat_keluar.harga_jual as harga_jual'),
+                DB::raw('SUM(obat_keluar.harga_jual * obat_keluar.qty_keluar) as total_jual')
+            )
+            ->groupBy('obats.item_code', 'obats.nama_obat', 'obat_keluar.harga_jual')
+            ->get();
+            
+        foreach ($laporan as $item) {
+            $item->pendapatan = $item->total_jual - $item->total_beli;
+        }
+            
+        $pdf = Pdf::loadView('laporan.keuangan_pdf', compact('laporan', 'bulanTampil'));
+        return $pdf->stream('laporan-keuangan-' . $bulanTerpilih . '.pdf');
     }
 }
