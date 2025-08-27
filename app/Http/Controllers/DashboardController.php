@@ -34,35 +34,42 @@ class DashboardController extends Controller
         $threeMonths = $today->copy()->addMonths(3);
 
         $expData = [
-            'belum'   => ObatMasuk::where('expire_date', '>', $sixMonths)->count(),
-            '6bulan'  => ObatMasuk::whereBetween('expire_date', [$threeMonths, $sixMonths])->count(),
-            '3bulan'  => ObatMasuk::whereBetween('expire_date', [$today, $threeMonths])->count(),
+            'belum' => ObatMasuk::where('expire_date', '>', $sixMonths)->count(),
+            '6bulan' => ObatMasuk::whereBetween('expire_date', [$threeMonths, $sixMonths])->count(),
+            '3bulan' => ObatMasuk::whereBetween('expire_date', [$today, $threeMonths])->count(),
             'expired' => ObatMasuk::where('expire_date', '<', $today)->count(),
         ];
 
         // === Data Bulanan ===
         $monthlyData = [];
-        $months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
         foreach (range(1, 12) as $month) {
-            $monthlyPembelian = ObatMasuk::whereMonth('tanggal_masuk', $month)
-                ->whereYear('tanggal_masuk', date('Y'))
-                ->select(DB::raw('SUM(harga_beli * qty_masuk) as total'))
+            // Total pembelian = qty keluar * harga beli
+            $monthlyPembelian = DB::table('obat_keluar')
+                ->join('obat_masuk', 'obat_keluar.item_code', '=', 'obat_masuk.item_code')
+                ->whereMonth('obat_keluar.tanggal_keluar', $month)
+                ->whereYear('obat_keluar.tanggal_keluar', date('Y'))
+                ->select(DB::raw('SUM(obat_keluar.qty_keluar * obat_masuk.harga_beli) as total'))
                 ->value('total');
 
+            // Total penjualan (harga jual * qty keluar)
             $monthlyPenjualan = ObatKeluar::whereMonth('tanggal_keluar', $month)
                 ->whereYear('tanggal_keluar', date('Y'))
                 ->select(DB::raw('SUM(harga_jual * qty_keluar) as total'))
                 ->value('total');
 
-            $monthlyData['labels'][] = $months[$month-1];
+            $monthlyData['labels'][] = $months[$month - 1];
             $monthlyData['pembelian'][] = $monthlyPembelian ?? 0;
             $monthlyData['penjualan'][] = $monthlyPenjualan ?? 0;
         }
 
+
         // === Stock Tersisa Per Obat ===
-        $stokObat = Obat::select('obats.nama_obat',
-            DB::raw('COALESCE(SUM(obat_masuk.qty_masuk),0) - COALESCE(SUM(obat_keluar.qty_keluar),0) as stok'))
+        $stokObat = Obat::select(
+            'obats.nama_obat',
+            DB::raw('COALESCE(SUM(obat_masuk.qty_masuk),0) - COALESCE(SUM(obat_keluar.qty_keluar),0) as stok')
+        )
             ->leftJoin('obat_masuk', 'obats.item_code', '=', 'obat_masuk.item_code')
             ->leftJoin('obat_keluar', 'obats.item_code', '=', 'obat_keluar.item_code')
             ->groupBy('obats.nama_obat')
@@ -74,8 +81,8 @@ class DashboardController extends Controller
             ->whereYear('obat_keluar.tanggal_keluar', date('Y'))
             ->groupBy('obats.nama_obat')
             ->orderByDesc('total')
-            ->pluck('total', 'obats.nama_obat'); 
-            // hasilnya: ['Paracetamol' => 120, 'Amoxicillin' => 90]
+            ->pluck('total', 'obats.nama_obat');
+        // hasilnya: ['Paracetamol' => 120, 'Amoxicillin' => 90]
 
         return view('dashboard.index', compact(
             'totalObat',

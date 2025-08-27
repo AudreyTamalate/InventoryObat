@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ObatController;
 use App\Http\Controllers\ObatMasukController;
 use App\Http\Controllers\ObatKeluarController;
@@ -8,24 +9,42 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\DashboardController;
 
-// Login dan auth
+/*
+|--------------------------------------------------------------------------
+| Login & Auth
+|--------------------------------------------------------------------------
+*/
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'process'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth')->name('dashboard');
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-
-// Halaman utama
+/*
+|--------------------------------------------------------------------------
+| Halaman Utama
+|--------------------------------------------------------------------------
+| - Kalau belum login → ke halaman login
+| - Kalau sudah login → ke dashboard
+*/
 Route::get('/', function () {
-    return view('welcome');
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+*/
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Routes dengan middleware auth
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth'])->group(function () {
 
     // Obat
@@ -54,10 +73,12 @@ Route::middleware(['auth'])->group(function () {
         ->name('laporan.stok.pdf')
         ->middleware('permission:laporan stok');
 
-    Route::get('laporan/keuangan/pdf', [LaporanController::class, 'keuanganPdf'])->name('laporan.keuangan.pdf');
-
     // Laporan Keuangan
     Route::get('/laporan/keuangan', [LaporanController::class, 'keuangan'])
         ->name('laporan.keuangan')
+        ->middleware('permission:laporan keuangan');
+
+    Route::get('/laporan/keuangan/pdf', [LaporanController::class, 'keuanganPdf'])
+        ->name('laporan.keuangan.pdf')
         ->middleware('permission:laporan keuangan');
 });
