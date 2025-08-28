@@ -229,7 +229,8 @@
         <h1>Dashboard</h1>
         <p id="welcome-message">Selamat datang!</p>
 
-        <!-- Summary Cards -->
+        <!-- Summary Cards (hanya kepala klinik) -->
+        @if(Auth::user()->role === 'kepala_klinik')
         <div class="summary-grid">
             <div class="summary-card">
                 <p>Total Pembelian Bulan Ini</p>
@@ -240,6 +241,7 @@
                 <h4>Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</h4>
             </div>
         </div>
+        @endif
 
         <!-- Charts Grid -->
         <div class="dashboard-grid">
@@ -256,11 +258,13 @@
             </div>
         </div>
 
-        <!-- Monthly Sales & Purchases Chart (pindah ke bawah sendiri) -->
+        <!-- Monthly Sales & Purchases Chart (khusus kepala klinik) -->
+        @if(Auth::user()->role === 'kepala_klinik')
         <div class="chart-container" style="margin-top:20px;">
             <h3>Pembelian & Penjualan per Bulan</h3>
             <canvas id="monthlyChart"></canvas>
         </div>
+        @endif
 
     </div>
     </div>
@@ -326,7 +330,8 @@
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
         });
 
-        // Chart Pembelian & Penjualan Bulanan
+        // Chart Pembelian & Penjualan Bulanan (hanya kepala klinik)
+        @if(Auth::user()->role === 'kepala_klinik')
         new Chart(document.getElementById('monthlyChart'), {
             type: 'line',
             data: {
@@ -338,6 +343,7 @@
             },
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
         });
+        @endif
     </script>
 </body>
 

@@ -81,4 +81,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/laporan/keuangan/pdf', [LaporanController::class, 'keuanganPdf'])
         ->name('laporan.keuangan.pdf')
         ->middleware('permission:laporan keuangan');
+
+    Route::get('/laporan/keuangan/excel', [LaporanController::class, 'keuanganExcel'])->name('laporan.keuangan.excel');
+
+    Route::get('/laporan/stok/excel', [LaporanController::class, 'stokExcel'])
+    ->name('laporan.stok.excel')
+    ->middleware('permission:laporan stok');
+
 });

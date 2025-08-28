@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +27,8 @@
             padding: 20px 0;
             display: flex;
             flex-direction: column;
-            position: fixed; /* Agar sidebar tetap di tempatnya saat konten digulir */
+            position: fixed;
+            /* Agar sidebar tetap di tempatnya saat konten digulir */
         }
 
         .sidebar .logo {
@@ -79,7 +81,8 @@
         .content {
             flex: 1;
             padding: 40px;
-            margin-left: 240px; /* Jarak agar tidak tertutup sidebar */
+            margin-left: 240px;
+            /* Jarak agar tidak tertutup sidebar */
         }
 
         .breadcrumb {
@@ -110,7 +113,8 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid #eee;
@@ -162,7 +166,8 @@
             justify-content: flex-end;
         }
 
-        .pdf-form button, .btn-pdf {
+        .pdf-form button,
+        .btn-pdf {
             background: #10b981;
             color: #fff;
             border: none;
@@ -177,6 +182,29 @@
         .btn-pdf:hover {
             background: #059669;
         }
+
+        .btn-excel {
+                background: #3b82f6;
+                color: #fff;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: 0.2s;
+                text-decoration: none;
+                /* Hilangin underline */
+                display: inline-block;
+                /* Biar kayak tombol */
+            }
+
+
+            .btn-excel:hover {
+                background: #2563eb;
+                text-decoration: none;
+                /* Pastikan ga muncul underline pas hover */
+            }
 
         /* Responsif untuk mobile */
         @media (max-width: 768px) {
@@ -241,7 +269,7 @@
         <div class="header">
             <h2>Laporan Keuangan</h2>
             <div class="actions">
-                <!-- Form untuk filter bulan, tombol "Tampilkan" dihapus -->
+                <!-- Form untuk filter bulan -->
                 <form id="filterForm" method="GET" action="{{ route('laporan.keuangan') }}" class="filter-form">
                     <div class="form-group">
                         <label for="bulan">Pilih Bulan:</label>
@@ -255,12 +283,20 @@
                     </div>
                 </form>
 
+                <!-- Tombol Print PDF -->
                 <form method="GET" action="{{ route('laporan.keuangan.pdf') }}" target="_blank" class="pdf-form">
-                    <input type="hidden" name="bulan" value="{{ request('bulan') }}">
+                    <input type="hidden" name="bulan" value="{{ request('bulan', $bulanTerpilih) }}">
                     <button type="submit" class="btn-pdf">
                         <i class="fa-solid fa-file-pdf"></i> Print PDF
                     </button>
                 </form>
+
+                <!-- Tombol Export Excel -->
+                <a href="{{ route('laporan.keuangan.excel', ['bulan' => $bulanTerpilih]) }}" class="btn-excel">
+                    <i class="fa-solid fa-file-excel"></i> Export Excel
+                </a>
+
+
             </div>
         </div>
 
@@ -322,7 +358,7 @@
         const bulanSelect = document.getElementById('bulan');
 
         // Tambahkan event listener untuk mendeteksi perubahan
-        bulanSelect.addEventListener('change', function() {
+        bulanSelect.addEventListener('change', function () {
             // Dapatkan nilai bulan yang dipilih
             const bulanTerpilih = this.value;
 
@@ -337,4 +373,5 @@
         });
     </script>
 </body>
+
 </html>

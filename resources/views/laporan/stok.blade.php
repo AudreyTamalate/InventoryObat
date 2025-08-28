@@ -148,7 +148,7 @@
         }
 
         .btn-filter {
-            background: #2563eb;
+            background: #ff9514ff;
             color: #fff;
             border: none;
             padding: 8px 16px;
@@ -288,6 +288,22 @@
         .black-row .delete-btn {
             background-color: #6b7280;
         }
+
+        .btn-excel {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-excel:hover {
+            background: #3b82f6; 
+        }
     </style>
 </head>
 
@@ -368,6 +384,12 @@
                     <input type="hidden" name="filter" value="{{ request('filter') }}">
                     <button type="submit" class="btn-pdf">
                         <i class="fa-solid fa-file-pdf"></i> Print PDF
+                    </button>
+                </form>
+                <form method="GET" action="{{ route('laporan.stok.excel') }}" target="_blank" class="excel-form">
+                    <input type="hidden" name="filter" value="{{ request('filter') }}">
+                    <button type="submit" class="btn-excel">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
                     </button>
                 </form>
             </div>
