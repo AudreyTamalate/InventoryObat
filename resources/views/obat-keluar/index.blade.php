@@ -130,14 +130,14 @@
             background-color: #f3f4f6;
             font-weight: 600;
         }
-        
+
         /* CSS yang dimodifikasi untuk tombol Aksi */
         .actions {
             display: flex;
             gap: 5px;
         }
 
-        .actions a, 
+        .actions a,
         .actions button {
             padding: 5px 10px;
             border: none;
@@ -148,12 +148,23 @@
             color: white;
             transition: background-color 0.2s;
         }
-        
-        .edit-btn { background-color: #2563eb; }
-        .edit-btn:hover { background-color: #1d4ed8; }
-        
-        .delete-btn { background-color: #ef4444; }
-        .delete-btn:hover { background-color: #dc2626; }
+
+        .edit-btn {
+            background-color: #2563eb;
+        }
+
+        .edit-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+        }
+
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+
         /* End of modified CSS */
 
         /* Modal Style */
@@ -244,9 +255,9 @@
 
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
-                <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
-                </a>
+                    <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
+                    </a>
 
                 @endif
             @endauth
@@ -298,15 +309,14 @@
                         <td>{{ \Carbon\Carbon::parse($keluar->tanggal_keluar)->format('d M Y') }}</td>
                         <td>{{ $keluar->keterangan ?? '-' }}</td>
                         <td class="actions">
-                            <a href="javascript:void(0)" class="edit-btn"
-                                onclick="openEditModal(
-                                       {{ $keluar->id }}, 
-                                       '{{ $keluar->item_code }}', 
-                                       '{{ $keluar->obat->nama_obat ?? '-' }}',
-                                       '{{ $keluar->harga_jual }}',
-                                       '{{ $keluar->qty_keluar }}',
-                                       '{{ \Carbon\Carbon::parse($keluar->tanggal_keluar)->format('Y-m-d') }}',
-                                       '{{ $keluar->keterangan ?? '' }}')">
+                            <a href="javascript:void(0)" class="edit-btn" onclick="openEditModal(
+                                           {{ $keluar->id }}, 
+                                           '{{ $keluar->item_code }}', 
+                                           '{{ $keluar->obat->nama_obat ?? '-' }}',
+                                           '{{ $keluar->harga_jual }}',
+                                           '{{ $keluar->qty_keluar }}',
+                                           '{{ \Carbon\Carbon::parse($keluar->tanggal_keluar)->format('Y-m-d') }}',
+                                           '{{ $keluar->keterangan ?? '' }}')">
                                 <i class="fa-solid fa-edit"></i> Edit
                             </a>
                             <button class="delete-btn" onclick="openDeleteModal({{ $keluar->id }})">
@@ -321,6 +331,12 @@
                 @endforelse
             </tbody>
         </table>
+
+        <div style="margin-top: 15px;">
+            {{ $obatKeluars->links() }}
+        </div>
+
+
     </div>
 
     <div class="modal" id="editModal">
@@ -329,25 +345,25 @@
             <form id="editForm" method="POST">
                 @csrf
                 @method('PUT')
-                
+
                 <label>Item Code</label>
                 <input type="text" id="editItemCode" name="item_code" readonly>
-                
+
                 <label>Nama Obat</label>
                 <input type="text" id="editNamaObat" readonly>
-                
+
                 <label>Harga Jual</label>
                 <input type="number" id="editHarga" name="harga_jual" required>
-                
+
                 <label>Qty Keluar</label>
                 <input type="number" name="qty_keluar" id="editQty" required>
-                
+
                 <label>Tanggal Keluar</label>
                 <input type="date" name="tanggal_keluar" id="editTanggal" required>
-                
+
                 <label>Keterangan</label>
                 <input type="text" name="keterangan" id="editKeterangan">
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan</button>
@@ -400,7 +416,7 @@
         function closeDeleteModal() {
             document.getElementById("deleteModal").style.display = "none";
         }
-        
+
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }

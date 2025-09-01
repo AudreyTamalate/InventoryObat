@@ -154,6 +154,8 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 8px;
+            text-align: left;
+
         }
 
         .combobox-list {
@@ -173,10 +175,15 @@
         .combobox-item {
             padding: 10px;
             cursor: pointer;
+            text-align: left;
         }
 
         .combobox-item:hover {
             background: #f3f4f6;
+        }
+
+        #itemSearchMasuk {
+            text-align: left;
         }
     </style>
 </head>
@@ -240,12 +247,10 @@
                     <div>
                         <label>Item Code / Nama Obat*</label>
                         <div class="combobox">
-                            <input type="text" id="itemSearchMasuk" placeholder="Ketik item code atau nama obat...">
+                            <input type="text" id="itemSearchMasuk" style="text-align: left;" placeholder="Ketik item code atau nama obat...">
                             <div class="combobox-list" id="itemListMasuk">
                                 @foreach($obats as $obat)
-                                    <div class="combobox-item" data-value="{{ $obat->item_code }}">
-                                        {{ $obat->item_code }} - {{ $obat->nama_obat }}
-                                    </div>
+                                    <div class="combobox-item" data-value="{{$obat->item_code}}">{{$obat->item_code}} - {{$obat->nama_obat}}</div>
                                 @endforeach
                             </div>
                             <input type="hidden" name="item_code" id="itemCodeMasuk">
@@ -317,6 +322,8 @@
                 itemListMasuk.style.display = 'none';
             }
         });
+
+        
     </script>
 
 </body>

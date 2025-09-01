@@ -342,6 +342,11 @@
                 @endforelse
             </tbody>
         </table>
+
+        <div style="margin-top: 15px;">
+            {{ $obatMasuk->links() }}
+        </div>
+
     </div>
 
     <div class="modal" id="deleteModal">

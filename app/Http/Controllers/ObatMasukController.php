@@ -11,7 +11,7 @@ class ObatMasukController extends Controller
     // Tampilkan semua obat masuk
     public function index()
     {
-        $obatMasuk = ObatMasuk::with('obat')->get(); // include relasi obat
+        $obatMasuk = ObatMasuk::with('obat')->paginate(10); // include relasi obat
         return view('obat-masuk.index', compact('obatMasuk'));
     }
 

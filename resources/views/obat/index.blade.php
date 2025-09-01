@@ -130,14 +130,14 @@
             background-color: #f3f4f6;
             font-weight: 600;
         }
-        
+
         /* CSS yang dimodifikasi untuk tombol Aksi */
         .actions {
             display: flex;
             gap: 5px;
         }
 
-        .actions a, 
+        .actions a,
         .actions button {
             padding: 5px 10px;
             border: none;
@@ -148,12 +148,23 @@
             color: white;
             transition: background-color 0.2s;
         }
-        
-        .edit-btn { background-color: #2563eb; }
-        .edit-btn:hover { background-color: #1d4ed8; }
-        
-        .delete-btn { background-color: #ef4444; }
-        .delete-btn:hover { background-color: #dc2626; }
+
+        .edit-btn {
+            background-color: #2563eb;
+        }
+
+        .edit-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+        }
+
+        .delete-btn:hover {
+            background-color: #dc2626;
+        }
+
         /* End of modified CSS */
 
         /* Modal Style */
@@ -244,9 +255,9 @@
 
             @auth
                 @if(auth()->user()->role === 'kepala_klinik')
-                <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
-                </a>
+                    <a href="/laporan/keuangan" class="{{ request()->is('laporan/keuangan*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Laporan Keuangan
+                    </a>
 
                 @endif
             @endauth
@@ -309,6 +320,11 @@
                 @endforelse
             </tbody>
         </table>
+
+        <div style="margin-top: 15px;">
+            {{ $obats->links() }}
+        </div>
+
     </div>
 
     <div class="modal" id="deleteModal">

@@ -184,27 +184,27 @@
         }
 
         .btn-excel {
-                background: #3b82f6;
-                color: #fff;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 500;
-                transition: 0.2s;
-                text-decoration: none;
-                /* Hilangin underline */
-                display: inline-block;
-                /* Biar kayak tombol */
-            }
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s;
+            text-decoration: none;
+            /* Hilangin underline */
+            display: inline-block;
+            /* Biar kayak tombol */
+        }
 
 
-            .btn-excel:hover {
-                background: #2563eb;
-                text-decoration: none;
-                /* Pastikan ga muncul underline pas hover */
-            }
+        .btn-excel:hover {
+            background: #2563eb;
+            text-decoration: none;
+            /* Pastikan ga muncul underline pas hover */
+        }
 
         /* Responsif untuk mobile */
         @media (max-width: 768px) {
@@ -351,6 +351,12 @@
                 </tr>
             </tfoot>
         </table>
+
+        <div class="mt-3">
+            {{ $laporan->links() }}
+        </div>
+
+
     </div>
 
     <script>

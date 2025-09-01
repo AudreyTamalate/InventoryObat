@@ -43,7 +43,7 @@ class LaporanController extends Controller
             $stok->orderBy('obats.nama_obat');
         }
 
-        $stok = $stok->get();
+        $stok = $stok->paginate(10);
         $bulanTampil = 'Semua';
 
         return view('laporan.stok', compact('stok', 'filter', 'bulanTampil'));
@@ -123,7 +123,7 @@ class LaporanController extends Controller
                 DB::raw('SUM(obat_keluar.harga_jual * obat_keluar.qty_keluar) as total_jual')
             )
             ->groupBy('obats.item_code', 'obats.nama_obat', 'obat_keluar.harga_jual')
-            ->get();
+            ->paginate(10);
 
         foreach ($laporan as $item) {
             $item->pendapatan = $item->total_jual - $item->total_beli;

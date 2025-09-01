@@ -174,10 +174,17 @@
         .combobox-item {
             padding: 10px;
             cursor: pointer;
+            text-align: left;
         }
 
         .combobox-item:hover {
             background: #f3f4f6;
+        }
+
+        .combobox input {
+            text-align: left !important; 
+            font-weight: normal;
+            color: #111827;
         }
     </style>
 </head>
@@ -238,9 +245,7 @@
                             <input type="text" id="itemSearch" placeholder="Ketik item code atau nama obat...">
                             <div class="combobox-list" id="itemList">
                                 @foreach($obats as $obat)
-                                    <div class="combobox-item" data-value="{{ $obat->item_code }}">
-                                        {{ $obat->item_code }} - {{ $obat->nama_obat }}
-                                    </div>
+                                    <div class="combobox-item" data-value="{{$obat->item_code}}">{{$obat->item_code}} - {{$obat->nama_obat}}</div>
                                 @endforeach
                             </div>
                             <input type="hidden" name="item_code" id="itemCode">

@@ -11,7 +11,7 @@ class ObatKeluarController extends Controller
     // Tampilkan semua data obat keluar
     public function index()
     {
-        $obatKeluars = ObatKeluar::with('obat')->get();
+        $obatKeluars = ObatKeluar::with('obat')->paginate(10);
         return view('obat-keluar.index', compact('obatKeluars'));
     }
 

@@ -10,7 +10,7 @@ class ObatController extends Controller
     // Tampilkan semua obat
     public function index()
     {
-        $obats = Obat::all();
+        $obats = Obat::paginate(10);
         return view('obat.index', compact('obats'));
     }
 

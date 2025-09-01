@@ -467,6 +467,11 @@
                 @endforelse
             </tbody>
         </table>
+
+        <div class="mt-3">
+            {{ $stok->links() }}
+        </div>
+
     </div>
 
     <script>
