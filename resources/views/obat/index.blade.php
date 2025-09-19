@@ -356,10 +356,10 @@
 
                 <label>Satuan</label>
                 <select id="edit_unit_of_measurement" name="unit_of_measurement" required>
-                    <option value="ampul">Botol</option>
-                    <option value="botol">Kapsul</option>
-                    <option value="kapsul">Tablet</option>
-                    <option value="tablet">Tube</option>
+                    <option value="botol">Botol</option>
+                    <option value="kapsul">Kapsul</option>
+                    <option value="tablet">Tablet</option>
+                    <option value="tube">Tube</option>
                 </select>
 
                 <label>Produsen</label>
